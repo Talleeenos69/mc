@@ -1,8 +1,62 @@
 #!/bin/bash
 
-if ! command -v java &> /dev/null; then
-    echo "Java is not installed. Installing..."
-    sudo dnf install java-11-openjdk
+# Function to install Java on Debian-based systems
+install_java_debian() {
+    sudo apt-get update
+    sudo apt-get install -y openjdk-11-jre
+}
+
+# Function to install Java on Fedora-based systems
+install_java_fedora() {
+    sudo dnf update
+    sudo dnf install -y java-11-openjdk
+}
+
+# Function to install Screen on Debian-based systems
+install_screen_debian() {
+    sudo apt-get update
+    sudo apt-get install -y screen
+}
+
+# Function to install Screen on Fedora-based systems
+install_screen_fedora() {
+    sudo dnf update
+    sudo dnf install -y screen
+}
+
+# Check the distribution
+if [ -x "$(command -v lsb_release)" ]; then
+    distro=$(lsb_release -si)
+elif [ -x "$(command -v rpm)" ]; then
+    distro=$(rpm --eval '%{distro}')
+else
+    echo "Unsupported distribution. Please install Java and Screen manually."
+    exit 1
 fi
 
+# Install Java based on the distribution
+if [ "$distro" == "Debian" ] || [ "$distro" == "Ubuntu" ]; then
+    echo "Detected Debian-based system. Installing Java..."
+    install_java_debian
+elif [ "$distro" == "Fedora" ]; then
+    echo "Detected Fedora-based system. Installing Java..."
+    install_java_fedora
+else
+    echo "Unsupported distribution. Please install Java manually."
+    exit 1
+fi
+
+# Install Screen based on the distribution
+if [ "$distro" == "Debian" ] || [ "$distro" == "Ubuntu" ]; then
+    echo "Detected Debian-based system. Installing Screen..."
+    install_screen_debian
+elif [ "$distro" == "Fedora" ]; then
+    echo "Detected Fedora-based system. Installing Screen..."
+    install_screen_fedora
+else
+    echo "Unsupported distribution. Please install Screen manually."
+    exit 1
+fi
+
+# Start the Minecraft server
 screen -S minecraft -dm bash -c 'java -Xmx6G -jar server.jar nogui'
