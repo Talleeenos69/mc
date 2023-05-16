@@ -1,2 +1,8 @@
 #!/bin/bash
+
+if ! command -v java &> /dev/null; then
+    echo "Java is not installed. Installing..."
+    sudo dnf install java-11-openjdk
+fi
+
 screen -S minecraft -dm bash -c 'java -Xmx6G -jar server.jar nogui'
